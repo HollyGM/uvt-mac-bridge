@@ -43,16 +43,26 @@ printf "keyUsage=digitalSignature\nauthorityInfoAccess=caIssuers;URI:http://repo
 "$OPENSSL" pkcs12 -export -legacy -inkey uvt.key -in uvt.pem -out uvt.p12 -passout pass:test 2>/dev/null \
   || "$OPENSSL" pkcs12 -export -inkey uvt.key -in uvt.pem -out uvt.p12 -passout pass:test
 
-python3 -I "$ROOT/Tests/support/test_servers.py" "$WORK" &
+python3 -I "$ROOT/Tests/support/test_servers.py" "$WORK" > python.log 2>&1 &
 SERVER_PID=$!
-for _ in $(seq 1 50); do [ -s http.port ] && [ -s https.port ] && break; sleep 0.1; done
+for _ in $(seq 1 300); do [ -s http.port ] && [ -s https.port ] && break; sleep 0.1; done
+if ! [ -s http.port ] || ! [ -s https.port ]; then
+  echo "erro: os servidores de teste (python) não subiram em 30 s" >&2
+  cat python.log >&2
+  exit 1
+fi
 
 # Servidor que imita o IIS da UVT (recusa h2 e pede o certificado por renegociação TLS 1.2). Opcional: precisa de Node.
 if command -v node >/dev/null 2>&1; then
-  node "$ROOT/Tests/support/iis_like_server.js" "$WORK" &
+  node "$ROOT/Tests/support/iis_like_server.js" "$WORK" > node.log 2>&1 &
   IIS_PID=$!
-  for _ in $(seq 1 50); do [ -s port ] && break; sleep 0.1; done
-  [ -s port ] && mv port reneg.port
+  for _ in $(seq 1 100); do [ -s port ] && break; sleep 0.1; done
+  if [ -s port ]; then
+    mv port reneg.port
+  else
+    echo "aviso: o servidor node não subiu; o teste de renegociação TLS será ignorado" >&2
+    cat node.log >&2
+  fi
 else
   echo "aviso: node não encontrado; o teste de renegociação TLS será ignorado"
 fi

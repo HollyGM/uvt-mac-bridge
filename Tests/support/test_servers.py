@@ -1,5 +1,6 @@
 """Servidores locais usados pelos testes do transporte HTTP (HTTP simples e HTTPS com mTLS)."""
 import json
+import socketserver
 import ssl
 import sys
 import threading
@@ -56,13 +57,21 @@ class Handler(BaseHTTPRequestHandler):
         self._send(200, json.dumps({"content_type": self.headers.get("Content-Type"), "body": body}))
 
 
-http_server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+class Server(ThreadingHTTPServer):
+    def server_bind(self):
+        # HTTPServer.server_bind chama socket.getfqdn() (DNS reverso), que em runners de CI sem DNS
+        # pode levar dezenas de segundos. Os testes só usam 127.0.0.1, então basta o bind.
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
+
+
+http_server = Server(("127.0.0.1", 0), Handler)
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(work / "server.pem", work / "server.key")
 context.verify_mode = ssl.CERT_REQUIRED
 context.load_verify_locations(work / "ca.pem")
-https_server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+https_server = Server(("127.0.0.1", 0), Handler)
 https_server.socket = context.wrap_socket(https_server.socket, server_side=True)
 
 (work / "http.port").write_text(str(http_server.server_address[1]))
