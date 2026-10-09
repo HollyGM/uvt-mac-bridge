@@ -1,0 +1,146 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* UVTMacBridgeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* UVTMacBridgeApp.swift */; };
+		A10000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* ContentView.swift */; };
+		A10000000000000000000003 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* AppModel.swift */; };
+		A10000000000000000000004 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* JSONValue.swift */; };
+		A10000000000000000000005 /* BrowserRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* BrowserRequest.swift */; };
+		A10000000000000000000006 /* BrowserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* BrowserResponse.swift */; };
+		A10000000000000000000007 /* URLSchemeParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* URLSchemeParser.swift */; };
+		A10000000000000000000008 /* CertificateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* CertificateService.swift */; };
+		A10000000000000000000009 /* NotificationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* NotificationClient.swift */; };
+		A1000000000000000000000A /* RequestDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000A /* RequestDispatcher.swift */; };
+		A1000000000000000000000B /* VersionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000B /* VersionHandler.swift */; };
+		A1000000000000000000000C /* ProxyRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000C /* ProxyRequestHandler.swift */; };
+		A1000000000000000000000D /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000D /* AppLogger.swift */; };
+		A10000000000000000000010 /* UVTCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* UVTCrypto.swift */; };
+		A10000000000000000000011 /* UVTHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* UVTHTTPClient.swift */; };
+		A10000000000000000000012 /* VersionChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* VersionChecker.swift */; };
+		A10000000000000000000013 /* ProxyLoginFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* ProxyLoginFlow.swift */; };
+		A10000000000000000000014 /* UserPrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* UserPrompts.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B10000000000000000000001 /* UVTMacBridgeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTMacBridgeApp.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B10000000000000000000003 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		B10000000000000000000004 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
+		B10000000000000000000005 /* BrowserRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserRequest.swift; sourceTree = "<group>"; };
+		B10000000000000000000006 /* BrowserResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserResponse.swift; sourceTree = "<group>"; };
+		B10000000000000000000007 /* URLSchemeParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSchemeParser.swift; sourceTree = "<group>"; };
+		B10000000000000000000008 /* CertificateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateService.swift; sourceTree = "<group>"; };
+		B10000000000000000000009 /* NotificationClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationClient.swift; sourceTree = "<group>"; };
+		B1000000000000000000000A /* RequestDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestDispatcher.swift; sourceTree = "<group>"; };
+		B1000000000000000000000B /* VersionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionHandler.swift; sourceTree = "<group>"; };
+		B1000000000000000000000C /* ProxyRequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxyRequestHandler.swift; sourceTree = "<group>"; };
+		B1000000000000000000000D /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		B1000000000000000000000E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B1000000000000000000000F /* UVTMacBridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UVTMacBridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000000000000000000010 /* UVTCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTCrypto.swift; sourceTree = "<group>"; };
+		B10000000000000000000011 /* UVTHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTHTTPClient.swift; sourceTree = "<group>"; };
+		B10000000000000000000012 /* VersionChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionChecker.swift; sourceTree = "<group>"; };
+		B10000000000000000000013 /* ProxyLoginFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxyLoginFlow.swift; sourceTree = "<group>"; };
+		B10000000000000000000014 /* UserPrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPrompts.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C10000000000000000000001 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D10000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000002 /* UVTMacBridge */,
+				D10000000000000000000008 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D10000000000000000000002 /* UVTMacBridge */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000001 /* UVTMacBridgeApp.swift */,
+				B10000000000000000000002 /* ContentView.swift */,
+				B10000000000000000000003 /* AppModel.swift */,
+				D10000000000000000000003 /* Models */,
+				D10000000000000000000004 /* Protocol */,
+				D10000000000000000000005 /* Services */,
+				D10000000000000000000006 /* Handlers */,
+				D10000000000000000000007 /* Support */,
+				B1000000000000000000000E /* Info.plist */,
+			);
+			path = UVTMacBridge;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B10000000000000000000004, B10000000000000000000005, B10000000000000000000006,); path = Models; sourceTree = "<group>"; };
+		D10000000000000000000004 /* Protocol */ = {isa = PBXGroup; children = (B10000000000000000000007,); path = Protocol; sourceTree = "<group>"; };
+		D10000000000000000000005 /* Services */ = {isa = PBXGroup; children = (B10000000000000000000008, B10000000000000000000009, B10000000000000000000010, B10000000000000000000011, B10000000000000000000012,); path = Services; sourceTree = "<group>"; };
+		D10000000000000000000006 /* Handlers */ = {isa = PBXGroup; children = (B1000000000000000000000A, B1000000000000000000000B, B1000000000000000000000C, B10000000000000000000013,); path = Handlers; sourceTree = "<group>"; };
+		D10000000000000000000007 /* Support */ = {isa = PBXGroup; children = (B1000000000000000000000D, B10000000000000000000014,); path = Support; sourceTree = "<group>"; };
+		D10000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B1000000000000000000000F /* UVTMacBridge.app */,); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E10000000000000000000001 /* UVTMacBridge */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F10000000000000000000001;
+			buildPhases = (C10000000000000000000002 /* Sources */, C10000000000000000000001 /* Frameworks */, C10000000000000000000003 /* Resources */,);
+			buildRules = ();
+			dependencies = ();
+			name = UVTMacBridge;
+			productName = UVTMacBridge;
+			productReference = B1000000000000000000000F /* UVTMacBridge.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E20000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 1600; LastUpgradeCheck = 1600; TargetAttributes = {E10000000000000000000001 = {CreatedOnToolsVersion = 16.0;};};};
+			buildConfigurationList = F10000000000000000000002;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base,);
+			mainGroup = D10000000000000000000001;
+			productRefGroup = D10000000000000000000008;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (E10000000000000000000001 /* UVTMacBridge */,);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C10000000000000000000003 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C10000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (A10000000000000000000001, A10000000000000000000002, A10000000000000000000003, A10000000000000000000004, A10000000000000000000005, A10000000000000000000006, A10000000000000000000007, A10000000000000000000008, A10000000000000000000009, A1000000000000000000000A, A1000000000000000000000B, A1000000000000000000000C, A1000000000000000000000D, A10000000000000000000010, A10000000000000000000011, A10000000000000000000012, A10000000000000000000013, A10000000000000000000014,);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F20000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEVELOPMENT_ASSET_PATHS = ""; ENABLE_APP_SANDBOX = NO; ENABLE_HARDENED_RUNTIME = YES; ENABLE_PREVIEWS = YES; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = UVTMacBridge/Info.plist; MACOSX_DEPLOYMENT_TARGET = 13.0; MARKETING_VERSION = 0.1.0; PRODUCT_BUNDLE_IDENTIFIER = br.local.uvtmacbridge; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = macosx; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; }; name = Debug; };
+		F20000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; ENABLE_APP_SANDBOX = NO; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = UVTMacBridge/Info.plist; MACOSX_DEPLOYMENT_TARGET = 13.0; MARKETING_VERSION = 0.1.0; ONLY_ACTIVE_ARCH = NO; PRODUCT_BUNDLE_IDENTIFIER = br.local.uvtmacbridge; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = macosx; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_VERSION = 5.0; }; name = Release; };
+		F20000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ANALYZER_NONNULL = YES; CLANG_CXX_LANGUAGE_STANDARD = "gnu++20"; CLANG_ENABLE_OBJC_ARC = YES; CLANG_WARN_BOOL_CONVERSION = YES; CLANG_WARN_CONSTANT_CONVERSION = YES; CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES; CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR; CLANG_WARN_EMPTY_BODY = YES; CLANG_WARN_ENUM_CONVERSION = YES; CLANG_WARN_INFINITE_RECURSION = YES; CLANG_WARN_INT_CONVERSION = YES; CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES; CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES; CLANG_WARN_OBJC_LITERAL_CONVERSION = YES; CLANG_WARN_RANGE_LOOP_ANALYSIS = YES; CLANG_WARN_STRICT_PROTOTYPES = YES; CLANG_WARN_SUSPICIOUS_MOVE = YES; COPY_PHASE_STRIP = NO; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_STRICT_OBJC_MSGSEND = YES; ENABLE_TESTABILITY = YES; GCC_C_LANGUAGE_STANDARD = gnu17; GCC_DYNAMIC_NO_PIC = NO; GCC_NO_COMMON_BLOCKS = YES; GCC_OPTIMIZATION_LEVEL = 0; GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)",); GCC_WARN_64_TO_32_BIT_CONVERSION = YES; GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR; GCC_WARN_UNDECLARED_SELECTOR = YES; GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE; GCC_WARN_UNUSED_FUNCTION = YES; GCC_WARN_UNUSED_VARIABLE = YES; MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE; MTL_FAST_MATH = YES; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+		F20000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ANALYZER_NONNULL = YES; CLANG_CXX_LANGUAGE_STANDARD = "gnu++20"; CLANG_ENABLE_OBJC_ARC = YES; CLANG_WARN_BOOL_CONVERSION = YES; CLANG_WARN_CONSTANT_CONVERSION = YES; CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES; CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR; CLANG_WARN_EMPTY_BODY = YES; CLANG_WARN_ENUM_CONVERSION = YES; CLANG_WARN_INFINITE_RECURSION = YES; CLANG_WARN_INT_CONVERSION = YES; CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES; CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES; CLANG_WARN_OBJC_LITERAL_CONVERSION = YES; CLANG_WARN_RANGE_LOOP_ANALYSIS = YES; CLANG_WARN_STRICT_PROTOTYPES = YES; CLANG_WARN_SUSPICIOUS_MOVE = YES; COPY_PHASE_STRIP = NO; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; ENABLE_NS_ASSERTIONS = NO; ENABLE_STRICT_OBJC_MSGSEND = YES; GCC_C_LANGUAGE_STANDARD = gnu17; GCC_NO_COMMON_BLOCKS = YES; GCC_WARN_64_TO_32_BIT_CONVERSION = YES; GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR; GCC_WARN_UNDECLARED_SELECTOR = YES; GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE; GCC_WARN_UNUSED_FUNCTION = YES; GCC_WARN_UNUSED_VARIABLE = YES; MTL_ENABLE_DEBUG_INFO = NO; MTL_FAST_MATH = YES; SWIFT_COMPILATION_MODE = wholemodule; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F10000000000000000000001 = {isa = XCConfigurationList; buildConfigurations = (F20000000000000000000001 /* Debug */, F20000000000000000000002 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		F10000000000000000000002 = {isa = XCConfigurationList; buildConfigurations = (F20000000000000000000003 /* Debug */, F20000000000000000000004 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = E20000000000000000000001 /* Project object */;
+}

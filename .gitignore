@@ -1,0 +1,17 @@
+# Build
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+
+# Nunca versionar credenciais, certificados ou logs
+*.pfx
+*.p12
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.p7b
+*.log

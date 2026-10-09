@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar
+        run: ./build-swiftc.sh
+      - name: Testes de protocolo e criptografia
+        run: ./Tests/run-tests.sh
