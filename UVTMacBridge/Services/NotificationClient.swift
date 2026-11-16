@@ -11,7 +11,7 @@ enum NotificationClientError: LocalizedError {
         case .hostNotAllowed(let host): return "Host de retorno recusado pela política de segurança local: \(host)"
         case .invalidHost: return "Host de retorno inválido"
         case .encoding: return "Não foi possível serializar a resposta"
-        case .http(let code, let body): return "UVT respondeu HTTP \(code) ao receber a notificação: \(body)"
+        case .http(let code, let body): return "UVT respondeu HTTP \(code) ao receber a notificação: \(AppLogger.shortened(body))"
         }
     }
 }

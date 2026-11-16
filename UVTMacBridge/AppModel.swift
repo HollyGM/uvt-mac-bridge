@@ -27,6 +27,7 @@ final class AppModel: ObservableObject {
     private let prompts: UserPrompting = AppKitPrompts()
     private let logger = AppLogger.shared
     private var queue: Task<Void, Never> = Task {}
+    private var logLines: [String] = []
 
     init() {
         autoNotify = UserDefaults.standard.object(forKey: "autoNotify") as? Bool ?? true
@@ -34,7 +35,9 @@ final class AppModel: ObservableObject {
         logger.onEntry = { [weak self] entry in
             Task { @MainActor in
                 guard let self else { return }
-                self.logText += entry + "\n"
+                // A janela mostra só as linhas mais recentes; o arquivo de log guarda tudo.
+                self.logLines = AppLogger.windowLines(self.logLines, appending: entry)
+                self.logText = self.logLines.joined(separator: "\n") + "\n"
             }
         }
     }
@@ -136,7 +139,7 @@ final class AppModel: ObservableObject {
             logger.info("Resposta enviada ao endpoint de notificação")
 
             status = response.type == "result" ? "Concluído" : "Concluído com erro"
-            if response.type == "error" { lastError = response.error }
+            if response.type == "error" { lastError = response.error.map { AppLogger.shortened($0) } }
         } catch {
             lastError = error.localizedDescription
             status = "Falha"

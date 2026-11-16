@@ -3,6 +3,10 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var model: AppModel
 
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+    }
+
     private func label(for identity: CertificateIdentity) -> String {
         var text = identity.displayName
         if identity.isExpired {
@@ -21,7 +25,7 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("UVT Mac Bridge")
                         .font(.title2.bold())
-                    Text("Cliente não oficial, compatível com o Módulo de Segurança UVT 1.0.11")
+                    Text("Versão \(appVersion) · cliente não oficial, compatível com o Módulo de Segurança UVT \(VersionHandler.compatibilityVersion)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -63,6 +67,12 @@ struct ContentView: View {
                         }
                     }
                     .labelsHidden()
+
+                    if let notice = model.identities.first(where: { $0.id == model.selectedIdentityID })?.validityNotice {
+                        Text(notice)
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
 
                     HStack {
                         Button("Atualizar certificados") {

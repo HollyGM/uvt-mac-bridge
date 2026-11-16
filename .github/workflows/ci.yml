@@ -4,12 +4,21 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Uma vez por mês, mesmo sem mudanças no código: o app depende de uma API de TLS que a Apple
+  # marcou como obsoleta, e uma imagem nova do macOS pode quebrá-lo sem ninguém perceber.
+  schedule:
+    - cron: "0 9 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: macos-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Compilar
         run: ./build-swiftc.sh
       - name: Testes de protocolo e criptografia

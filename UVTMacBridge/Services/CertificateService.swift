@@ -9,11 +9,83 @@ struct CertificateIdentity: Identifiable, Hashable, Sendable {
     let notAfter: Date?
     let isSelfSigned: Bool
     var isTokenBacked = false
+    var notBefore: Date? = nil
 
     var isExpired: Bool { notAfter.map { $0 < Date() } ?? false }
 
     /// Candidato razoável a certificado de uso real (e-CPF/e-CNPJ/OAB): emitido por uma AC e dentro da validade.
     var isLikelyUsable: Bool { !isSelfSigned && !isExpired }
+
+    /// Aviso para mostrar na janela: vencido, ainda não válido ou perto de vencer. `nil` se estiver tudo certo.
+    var validityNotice: String? {
+        CertificateValidity(notBefore: notBefore, notAfter: notAfter).message
+    }
+}
+
+/// Situação da validade de um certificado em relação a hoje.
+enum CertificateValidity: Equatable {
+    case valid
+    case expiresSoon(days: Int, on: Date)
+    case expired(on: Date)
+    case notYetValid(from: Date)
+
+    /// Com quantos dias de antecedência o vencimento é avisado.
+    static let warningDays = 30
+
+    init(notBefore: Date?, notAfter: Date?, now: Date = Date(), calendar: Calendar = .current) {
+        if let notAfter, now > notAfter {
+            self = .expired(on: notAfter)
+        } else if let notBefore, now < notBefore {
+            self = .notYetValid(from: notBefore)
+        } else if let notAfter,
+                  let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: notAfter)).day,
+                  days < Self.warningDays {
+            self = .expiresSoon(days: days, on: notAfter)
+        } else {
+            self = .valid
+        }
+    }
+
+    init(certificate: SecCertificate, now: Date = Date()) {
+        self.init(
+            notBefore: CertificateService.notBefore(of: certificate),
+            notAfter: CertificateService.notAfter(of: certificate),
+            now: now
+        )
+    }
+
+    /// O servidor recusa o certificado nesses casos; melhor parar antes de pedir PIN ou senha.
+    var blocksLogin: Bool {
+        switch self {
+        case .expired, .notYetValid: return true
+        case .valid, .expiresSoon: return false
+        }
+    }
+
+    var message: String? {
+        switch self {
+        case .valid:
+            return nil
+        case .expired(let date):
+            return "O certificado selecionado venceu em \(Self.format(date)) e não é aceito pela UVT. Renove o certificado ou selecione outro no UVT Mac Bridge."
+        case .notYetValid(let date):
+            return "O certificado selecionado só passa a valer em \(Self.format(date)). Confira a data e a hora do Mac."
+        case .expiresSoon(let days, let date):
+            let when: String
+            switch days {
+            case ..<1: when = "vence hoje (\(Self.format(date)))"
+            case 1: when = "vence amanhã (\(Self.format(date)))"
+            default: when = "vence em \(Self.format(date)), daqui a \(days) dias"
+            }
+            return "O certificado selecionado \(when). Providencie a renovação."
+        }
+    }
+
+    static func format(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        return formatter.string(from: date)
+    }
 }
 
 enum CertificateServiceError: LocalizedError {
@@ -53,7 +125,8 @@ final class CertificateService: @unchecked Sendable {
                 derBase64: der.base64EncodedString(),
                 notAfter: Self.notAfter(of: certificate),
                 isSelfSigned: Self.isSelfSigned(certificate),
-                isTokenBacked: Self.isTokenBacked(identity)
+                isTokenBacked: Self.isTokenBacked(identity),
+                notBefore: Self.notBefore(of: certificate)
             )
         }
         // Certificados de uso real primeiro; o resto em ordem alfabética.
@@ -64,9 +137,16 @@ final class CertificateService: @unchecked Sendable {
     }
 
     static func notAfter(of certificate: SecCertificate) -> Date? {
-        let keys = [kSecOIDX509V1ValidityNotAfter] as CFArray
-        guard let values = SecCertificateCopyValues(certificate, keys, nil) as? [CFString: Any],
-              let entry = values[kSecOIDX509V1ValidityNotAfter] as? [CFString: Any],
+        validityDate(of: certificate, key: kSecOIDX509V1ValidityNotAfter)
+    }
+
+    static func notBefore(of certificate: SecCertificate) -> Date? {
+        validityDate(of: certificate, key: kSecOIDX509V1ValidityNotBefore)
+    }
+
+    private static func validityDate(of certificate: SecCertificate, key: CFString) -> Date? {
+        guard let values = SecCertificateCopyValues(certificate, [key] as CFArray, nil) as? [CFString: Any],
+              let entry = values[key] as? [CFString: Any],
               let seconds = entry[kSecPropertyKeyValue] as? NSNumber else { return nil }
         return Date(timeIntervalSinceReferenceDate: seconds.doubleValue)
     }
@@ -108,10 +188,6 @@ final class CertificateService: @unchecked Sendable {
         CertificateChainBuilder().intermediates(for: certificate)
     }
 
-    func decryptRSA(ciphertext: Data, identityID: String) throws -> Data {
-        try decryptRSA(ciphertext: ciphertext, identity: try identity(withID: identityID))
-    }
-
     func decryptRSA(ciphertext: Data, identity: SecIdentity) throws -> Data {
         var privateKey: SecKey?
         let status = SecIdentityCopyPrivateKey(identity, &privateKey)
@@ -131,27 +207,6 @@ final class CertificateService: @unchecked Sendable {
             throw CertificateServiceError.crypto(message)
         }
         return clear as Data
-    }
-
-    func signSHA256(message: Data, identityID: String) throws -> Data {
-        let identity = try identity(withID: identityID)
-        var privateKey: SecKey?
-        let status = SecIdentityCopyPrivateKey(identity, &privateKey)
-        guard status == errSecSuccess, let privateKey else {
-            if status != errSecSuccess { throw CertificateServiceError.keychain(status) }
-            throw CertificateServiceError.privateKeyUnavailable
-        }
-
-        let algorithm = SecKeyAlgorithm.rsaSignatureMessagePKCS1v15SHA256
-        guard SecKeyIsAlgorithmSupported(privateKey, .sign, algorithm) else {
-            throw CertificateServiceError.unsupportedKey
-        }
-        var error: Unmanaged<CFError>?
-        guard let signature = SecKeyCreateSignature(privateKey, algorithm, message as CFData, &error) else {
-            let message = error?.takeRetainedValue().localizedDescription ?? "erro desconhecido"
-            throw CertificateServiceError.crypto(message)
-        }
-        return signature as Data
     }
 
     private func rawIdentities() throws -> [SecIdentity] {

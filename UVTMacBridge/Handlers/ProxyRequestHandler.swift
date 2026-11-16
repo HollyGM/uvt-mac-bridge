@@ -23,6 +23,14 @@ enum ProxyRequestHandler {
         if CertificateService.isSelfSigned(certificate) {
             return .failure("O certificado selecionado é autoassinado e não é aceito pela UVT. Abra o UVT Mac Bridge e selecione o seu e-CPF/e-CNPJ emitido por uma AC (ICP-Brasil).", status: 0)
         }
+        // Vencido (ou ainda não válido) o servidor recusaria com um 403 sem explicação, depois do PIN.
+        let validity = CertificateValidity(certificate: certificate)
+        if validity.blocksLogin, let message = validity.message {
+            return .failure(message, status: 0)
+        }
+        if let message = validity.message {
+            AppLogger.shared.info("Atenção: \(message)")
+        }
         let intermediates = context.certificateService.intermediates(for: certificate)
         // Só o nome, sem o ":CPF" que os certificados e-CPF carregam no CN.
         let subject = (SecCertificateCopySubjectSummary(certificate) as String?) ?? "?"

@@ -17,6 +17,9 @@ enum URLSchemeParserError: LocalizedError {
 }
 
 struct URLSchemeParser {
+    /// Destino das mensagens de diagnóstico (injetável nos testes).
+    var log: @Sendable (String) -> Void = { AppLogger.shared.error($0) }
+
     func parse(url: URL) throws -> BrowserRequest {
         guard url.scheme?.lowercased() == "sefazrnuvt" else {
             throw URLSchemeParserError.invalidScheme
@@ -50,9 +53,17 @@ struct URLSchemeParser {
         do {
             return try JSONDecoder().decode(BrowserRequest.self, from: data)
         } catch {
-            let preview = String(data: data, encoding: .utf8) ?? "<dados não UTF-8>"
-            AppLogger.shared.error("Payload decodificado: \(preview)")
+            log(Self.describeInvalidPayload(data))
             throw URLSchemeParserError.invalidJSON(error.localizedDescription)
         }
+    }
+
+    /// Diagnóstico de um payload recusado sem copiar valores para o log: a requisição traz o token
+    /// da sessão e dados do usuário. Só os nomes dos campos (ou o tamanho) são registrados.
+    static func describeInvalidPayload(_ data: Data) -> String {
+        if let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return "Requisição com campos inesperados: \(object.keys.sorted().joined(separator: ", "))"
+        }
+        return "Payload decodificado não é um objeto JSON (\(data.count) bytes)"
     }
 }

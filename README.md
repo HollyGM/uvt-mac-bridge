@@ -52,9 +52,11 @@ Abra o app uma vez depois de copiar, para o macOS associar o protocolo ao novo l
 
 Quem preferir o Xcode pode abrir `UVTMacBridge.xcodeproj`, mas o caminho testado é o `build-swiftc.sh`.
 
+As mudanças de cada versão estão no [CHANGELOG.md](CHANGELOG.md); a versão instalada aparece no topo da janela.
+
 ## Como usar
 
-1. Abra o **UVT Mac Bridge** e confira, em **Certificado**, se o seu e-CPF/e-CNPJ está selecionado. O app lembra da escolha e, por padrão, sugere um certificado emitido por AC e dentro da validade. Certificados autoassinados são recusados.
+1. Abra o **UVT Mac Bridge** e confira, em **Certificado**, se o seu e-CPF/e-CNPJ está selecionado. O app lembra da escolha e, por padrão, sugere um certificado emitido por AC e dentro da validade. Certificados autoassinados e vencidos são recusados antes de qualquer pedido de PIN; quando faltam menos de 30 dias para o vencimento, um aviso aparece abaixo do certificado.
 2. Entre na UVT normalmente pelo navegador. Quando a página acionar o módulo de segurança, o navegador pergunta se pode abrir o `UVTMacBridge`; confirme.
 3. Se usa token A3, informe o PIN quando o macOS pedir.
 4. No **primeiro acesso de cada certificado**, o app pede a senha do SIGAT. Depois disso, o login não pede mais.
@@ -69,12 +71,13 @@ O log deve mostrar `Método: version`.
 
 ## Solução de problemas
 
-O log fica em `~/Library/Logs/UVTMacBridge/uvt-mac-bridge.log` (e na janela do app). Ele não contém senhas, cabeçalhos de autenticação nem o conteúdo das respostas do login.
+O log fica em `~/Library/Logs/UVTMacBridge/uvt-mac-bridge.log`; a janela do app mostra as últimas 500 linhas. Ele não contém senhas, cabeçalhos de autenticação, o conteúdo das respostas do login nem os valores das requisições (de um link inválido, só os nomes dos campos). Mensagens de erro do servidor aparecem cortadas em 300 caracteres.
 
 | Sintoma | O que fazer |
 |---|---|
 | O macOS pede a **senha do chaveiro "login"** | É a senha do seu usuário do Mac, não a do certificado. Vale para certificados com chave de software no Keychain; "Permitir Sempre" evita repetir. Token A3 pede o **PIN**, não esta senha. |
 | "O certificado selecionado é autoassinado…" | Selecione o seu e-CPF/e-CNPJ emitido por uma AC. Autoassinados nunca são aceitos pela UVT. |
+| "O certificado selecionado venceu em…" | Renove o certificado com a sua AC ou selecione outro em **Certificado**. A UVT recusa certificado vencido. |
 | `403 - Acesso Negado` no `requestpass` | O servidor não aceitou o certificado. Veja no log a linha "intermediários enviados": deve ser maior que zero para certificados com cadeia de AC. Sem internet, o app não consegue completar a cadeia. |
 | "Senha do SIGAT inválida" | O app pergunta de novo. Evite tentar senhas por palpite. |
 | O navegador não abre o app | Rode `./build-swiftc.sh` de novo (ele registra o protocolo) ou abra o app uma vez a partir da pasta definitiva. |
@@ -140,6 +143,8 @@ Não precisam de Xcode nem de acesso à rede. Requerem `openssl` e `python3`; se
 Os testes geram uma CA e certificados de teste, sobem servidores locais (HTTP e HTTPS com certificado de cliente obrigatório) e cobrem: o parser, o envelope de resposta, a criptografia conferida contra o `openssl`, o fluxo de login completo contra uma UVT simulada (primeiro acesso, acessos seguintes, senha errada, cancelamento, laços infinitos, erros HTTP), a montagem da cadeia por AIA, as notificações e a política de hosts. Os certificados de teste vão para um Keychain temporário, nunca para o seu.
 
 A UVT simulada prova que o app é coerente com o protocolo descrito acima, não que o servidor real o aceita; essa parte só se confirma com certificado e senha reais.
+
+No GitHub, a compilação e os testes rodam a cada envio e também uma vez por mês, para avisar cedo se uma atualização do macOS afetar o app.
 
 ## Segurança e privacidade
 

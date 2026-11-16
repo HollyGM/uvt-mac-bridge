@@ -28,7 +28,7 @@ enum UVTCrypto {
         Data(text.utf16.map { $0 < 128 ? UInt8($0) : UInt8(ascii: "?") })
     }
 
-    /// Equivalente a `new X509Certificate2(Encoding.ASCII.GetBytes(texto))` para PEM ou Base64 de DER.
+    /// Lê o certificado que a UVT devolve como texto: PEM ou Base64 de DER.
     static func certificate(fromServerText text: String) throws -> SecCertificate {
         let lines = text
             .components(separatedBy: .newlines)
@@ -42,7 +42,7 @@ enum UVTCrypto {
         return certificate
     }
 
-    /// `RSACryptoServiceProvider.Encrypt(bytes, fOAEP: false)`.
+    /// Cifra com a chave pública do certificado em RSA PKCS#1 v1.5 (sem OAEP), o formato que a UVT espera.
     static func rsaEncryptPKCS1(_ plain: Data, with certificate: SecCertificate) throws -> Data {
         guard let publicKey = SecCertificateCopyKey(certificate) else { throw UVTCryptoError.invalidCertificate }
         guard SecKeyIsAlgorithmSupported(publicKey, .encrypt, .rsaEncryptionPKCS1) else {

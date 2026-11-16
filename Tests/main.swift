@@ -184,6 +184,24 @@ func testParser() {
     let urlSafe = b64.replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_").replacingOccurrences(of: "=", with: "")
     check((try? parser.parse(url: URL(string: "sefazrnuvt://\(urlSafe)")!))?.method == "proxyRequest", "aceita Base64 URL-safe sem padding")
     check((try? parser.parse(url: URL(string: "sefazrnuvt://eyJtZXRob2QiOiJ2ZXJzaW9uIn0=")!))?.method == "version", "payload do TEST_VERSION.command")
+
+    // Payload recusado: o log recebe só os nomes dos campos, nunca os valores (como o token da sessão)
+    let logged = LogBox()
+    let quiet = URLSchemeParser(log: { logged.append($0) })
+    let semMethod = Data(#"{"host":"https://api.sefaz.rn.gov.br/usuarios/","token":"SEGREDO-DA-SESSAO"}"#.utf8).base64EncodedString()
+    check((try? quiet.parse(url: URL(string: "sefazrnuvt://\(semMethod)")!)) == nil, "recusa requisição sem method")
+    check(logged.lines.count == 1 && logged.lines[0].contains("token") && !logged.lines[0].contains("SEGREDO-DA-SESSAO"),
+          "payload recusado: o log traz só os nomes dos campos (\(logged.lines.first ?? "nada"))")
+    let naoJSON = Data("isto nao e json SEGREDO".utf8).base64EncodedString()
+    _ = try? quiet.parse(url: URL(string: "sefazrnuvt://\(naoJSON)")!)
+    check(logged.lines.count == 2 && !logged.lines[1].contains("SEGREDO"), "payload que não é JSON: registra só o tamanho")
+}
+
+final class LogBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var stored: [String] = []
+    var lines: [String] { lock.lock(); defer { lock.unlock() }; return stored }
+    func append(_ line: String) { lock.lock(); stored.append(line); lock.unlock() }
 }
 
 func testResponseEnvelope() {
@@ -238,6 +256,52 @@ func testCertificateInfo(user: (identity: SecIdentity, certificate: SecCertifica
     let expired = CertificateIdentity(id: "b", displayName: "x", derBase64: "", notAfter: Date().addingTimeInterval(-86_400), isSelfSigned: false)
     let selfSigned = CertificateIdentity(id: "c", displayName: "x", derBase64: "", notAfter: Date().addingTimeInterval(86_400), isSelfSigned: true)
     check(usable.isLikelyUsable && !expired.isLikelyUsable && !selfSigned.isLikelyUsable, "só sugere certificados válidos e não autoassinados")
+
+    section("Validade do certificado (vencido não segue para o login)")
+    let calendar = Calendar.current
+    let noon = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: Date())!
+    func days(_ n: Int) -> Date { calendar.date(byAdding: .day, value: n, to: noon)! }
+
+    let vencido = CertificateValidity(notBefore: days(-30), notAfter: days(-1), now: noon)
+    check(vencido == .expired(on: days(-1)) && vencido.blocksLogin, "vencido é detectado e bloqueia o login")
+    check(vencido.message?.contains("venceu em \(CertificateValidity.format(days(-1)))") == true, "mensagem de vencido traz a data: \(vencido.message ?? "nil")")
+    let futuro = CertificateValidity(notBefore: days(2), notAfter: days(30), now: noon)
+    check(futuro.blocksLogin && futuro.message?.contains("só passa a valer") == true, "ainda não válido bloqueia o login")
+
+    let perto = CertificateValidity(notBefore: days(-1), notAfter: days(10), now: noon)
+    check(perto == .expiresSoon(days: 10, on: days(10)), "faltando 10 dias, conta 10 dias")
+    check(!perto.blocksLogin && perto.message?.contains("Providencie a renovação") == true, "perto de vencer avisa, mas não bloqueia")
+    let hoje = CertificateValidity(notBefore: nil, notAfter: noon.addingTimeInterval(3_600), now: noon)
+    let amanha = CertificateValidity(notBefore: nil, notAfter: days(1), now: noon)
+    check(hoje.message?.contains("vence hoje") == true && amanha.message?.contains("vence amanhã") == true, "textos 'vence hoje' e 'vence amanhã'")
+    let longe = CertificateValidity(notBefore: days(-1), notAfter: days(90), now: noon)
+    check(longe == .valid && longe.message == nil, "longe de vencer: sem aviso")
+
+    check(CertificateService.notBefore(of: user.certificate).map { $0 < Date() } == true, "lê a data de início da validade")
+    if case .expiresSoon = CertificateValidity(certificate: user.certificate) {
+        check(true, "certificado de teste (vale 2 dias) é marcado como perto de vencer")
+    } else {
+        check(false, "certificado de teste (vale 2 dias) é marcado como perto de vencer")
+    }
+    check(expired.validityNotice?.contains("venceu") == true && longeDoVencimento.validityNotice == nil, "aviso da janela: vencido aparece, válido não")
+}
+
+let longeDoVencimento = CertificateIdentity(id: "d", displayName: "x", derBase64: "", notAfter: Date().addingTimeInterval(400 * 86_400), isSelfSigned: false)
+
+func testLogLimits() {
+    section("Limites do log e da janela")
+    let big = String(repeating: "x", count: 1_400_000)
+    let short = AppLogger.shortened(big)
+    check(short.count < AppLogger.maxMessageLength + 40 && short.contains("1400000 caracteres"), "texto de 1,4 MB é cortado (\(short.count) caracteres)")
+    check(AppLogger.shortened("curto") == "curto", "texto curto fica igual")
+    let description = NotificationClientError.http(500, big).errorDescription ?? ""
+    check(description.count < 500, "erro da notificação não carrega a página inteira (\(description.count) caracteres)")
+    var lines: [String] = []
+    for index in 1...(AppLogger.maxWindowLines + 100) {
+        lines = AppLogger.windowLines(lines, appending: "linha \(index)")
+    }
+    check(lines.count == AppLogger.maxWindowLines && lines.first == "linha 101" && lines.last == "linha \(AppLogger.maxWindowLines + 100)",
+          "a janela guarda só as \(AppLogger.maxWindowLines) linhas mais recentes")
 }
 
 func testChainBuilder() async {
@@ -466,6 +530,7 @@ testParser()
 testResponseEnvelope()
 testCrypto(user: user)
 testCertificateInfo(user: user)
+testLogLimits()
 await testChainBuilder()
 await testLoginFlow(user: user, uvt: uvt)
 await testNotifications()

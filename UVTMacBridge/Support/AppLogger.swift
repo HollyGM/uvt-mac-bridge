@@ -22,6 +22,23 @@ final class AppLogger: @unchecked Sendable {
     func info(_ message: String) { write("INFO", message) }
     func error(_ message: String) { write("ERRO", message) }
 
+    /// Limite para textos vindos do servidor (páginas de erro do IIS chegam a ~1,4 MB).
+    static let maxMessageLength = 300
+
+    /// Corta um texto longo para o log e para a janela, dizendo o tamanho original.
+    static func shortened(_ text: String, limit: Int = maxMessageLength) -> String {
+        guard text.count > limit else { return text }
+        return String(text.prefix(limit)) + "… (\(text.count) caracteres)"
+    }
+
+    /// Quantas linhas do log ficam visíveis na janela (o arquivo guarda tudo).
+    static let maxWindowLines = 500
+
+    /// Linhas da janela depois de acrescentar `entry`, mantendo só as mais recentes.
+    static func windowLines(_ lines: [String], appending entry: String, max: Int = maxWindowLines) -> [String] {
+        Array((lines + [entry]).suffix(max))
+    }
+
     private func write(_ level: String, _ message: String) {
         let line = "[\(formatter.string(from: Date()))] [\(level)] \(redact(message))"
         NSLog("%@", line)

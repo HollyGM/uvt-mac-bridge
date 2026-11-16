@@ -149,7 +149,7 @@ struct ProxyLoginFlow {
         ]
     }
 
-    /// `OnReceivedOtherResponse`: 200/300 com JSON vira `result`; o resto vira `error` com o status.
+    /// Resposta final do login: 200/300 com JSON vira `result`; o resto vira `error` com o status.
     static func finalResponse(from http: UVTHTTPResponse) -> BrowserResponse {
         if http.status == 200 || http.status == 300 {
             guard let json = JSONValue.parse(http.body), json.objectValue != nil else {
